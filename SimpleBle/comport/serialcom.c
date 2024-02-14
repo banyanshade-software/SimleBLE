@@ -4,10 +4,10 @@
  *  Created on: Feb 14, 2024
  *      Author: danielbraun
  */
-
-#include "../comport/serialcom.h"
-
 #include <stdint.h>
+
+#include "serialcom.h"
+
 #include "../misc.h"
 #include "main.h"
 #include "../itm_debug.h"
