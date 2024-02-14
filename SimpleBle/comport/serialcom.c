@@ -5,20 +5,40 @@
  *      Author: danielbraun
  */
 #include <stdint.h>
-
+#include <string.h>
 #include "serialcom.h"
 
 #include "../misc.h"
 #include "main.h"
 #include "../itm_debug.h"
+#include "../serial/serial.h"
+
+extern osThreadId comTaskHandle;
+
+static void gotline(serial_t *s, int ok);
 
 void StartComTask(void const * argument)
 {
 	itm_debug1(DBG_COM, "STRTc", 0);
+	serial_t *ser = &serials[PORT_VCOM];
+	ser->taskHandle = comTaskHandle;
+	ser->linecallback = gotline;
+	serial_start_rx(PORT_VCOM);
+	//serial_setup(PORT_VCOM, comTaskHandle);
+
+	const char *s = "coucou\r\n";
+	const int l = strlen(s);
 	for (;;) {
 		osDelay(500);
 		flash_led();
+		serial_send_bytes(PORT_VCOM, (uint8_t *)s, l, 0);
 	}
+}
+
+static void gotline(serial_t *s, int ok)
+{
+	itm_debug1(DBG_COM, "line", s->rxidx);
+	s->rxidx = 0;
 }
 
 #if 0
