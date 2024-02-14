@@ -13,6 +13,9 @@
 
 void flash_led(void);
 
+
+#define TEST_AT_ON_VCOM 1
+
 #define _UNUSED_ __attribute__((unused))
 
 

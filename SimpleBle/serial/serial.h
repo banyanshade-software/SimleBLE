@@ -24,8 +24,8 @@ int serial_send_bytes(int port, const uint8_t *b, int len, int needcopy);
 
 
 #define NOTIF_UART_TX		0x00000100
-//#define NOTIF_UART_TX		0x00000100
-
+#define NOTIF_AT_RESP_OK	0x00000001
+#define NOTIF_AT_RESP_OTHER	0x00000002
 
 typedef struct serial {
 	osThreadId          taskHandle;

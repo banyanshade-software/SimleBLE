@@ -144,11 +144,13 @@ void HAL_UART_RxCpltCallback(_UNUSED_ UART_HandleTypeDef *huart)
 	char c = s->rxbuf[s->rxidx];
 	if (c == s->eolcar) {
 		s->linecallback(s, 1);
+		serial_start_rx(port);
 		return;
 	}
 	s->rxidx++;
 	if (s->rxidx == s->rxbuflen) {
 		s->linecallback(s, 0);
+		s->rxidx = 0;
 	}
 
 	serial_start_rx(port);

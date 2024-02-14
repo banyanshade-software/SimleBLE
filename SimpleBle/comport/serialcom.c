@@ -19,6 +19,11 @@ static void gotline(serial_t *s, int ok);
 
 void StartComTask(void const * argument)
 {
+#if TEST_AT_ON_VCOM
+	for (;;) {
+		osDelay(1000);
+	}
+#endif
 	itm_debug1(DBG_COM, "STRTc", 0);
 	serial_t *ser = &serials[PORT_VCOM];
 	ser->taskHandle = comTaskHandle;
