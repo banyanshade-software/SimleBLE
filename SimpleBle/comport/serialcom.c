@@ -6,16 +6,22 @@
  */
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 #include "serialcom.h"
 
 #include "../misc.h"
 #include "main.h"
 #include "../itm_debug.h"
 #include "../serial/serial.h"
+#include "../resmsg.h"
+
 
 extern osThreadId comTaskHandle;
+extern osMessageQId resQueueHandle;
 
 static void gotline(serial_t *s, int ok);
+
+static uint8_t txbuffer[96];
 
 void StartComTask(void const * argument)
 {
@@ -28,19 +34,40 @@ void StartComTask(void const * argument)
 	serial_t *ser = &serials[PORT_VCOM];
 	ser->taskHandle = comTaskHandle;
 	ser->linecallback = gotline;
+	ser->txbuf = txbuffer;
+	ser->txbuflen = sizeof(txbuffer);
 	// serial port is used only for logging
 	if ((0)) serial_start_rx(PORT_VCOM);
-	//serial_setup(PORT_VCOM, comTaskHandle);
 
-	const char *s1 = "coucou\r\n";
-	const char *s2 = "hello\r\n";
-	for (int i=0;;i++) {
-		osDelay(500);
-		flash_led();
-		char *s = (i%3) ? s1 : s2;
-		int l = strlen(s);
-		itm_debug1(DBG_COM, "c-send", l);
-		serial_send_bytes(PORT_VCOM, (uint8_t *)s, l, 0);
+
+	if ((0)) {
+		const char *s1 = "coucou\r\n";
+		const char *s2 = "hello\r\n";
+		for (int i=0;;i++) {
+			osDelay(500);
+			flash_led();
+			const char *s = (i%3) ? s1 : s2;
+			int l = strlen(s);
+			itm_debug1(DBG_COM, "c-send", l);
+			serial_send_bytes(PORT_VCOM, (uint8_t *)s, l, 0);
+		}
+	}
+	for (;;) {
+		resmsg_t m;
+		BaseType_t rc = xQueueReceive(resQueueHandle, &m, portMAX_DELAY);
+		if (!rc) {
+			itm_debug1(DBG_ERR|DBG_COM, "rec no", 0);
+			continue;
+		}
+		char s[64];
+		// TODO replace snprintf by custom func, since snprintf stack usage is huge
+		if (0 == m.type) {
+			// info
+			snprintf(s, sizeof(s),  "%10lu INFO %d %d\r\n", m.ts, m.devnum, m.infocode);
+		} else {
+			snprintf(s, sizeof(s),  "%10lu %d %d\r\n", m.ts, m.devnum, m.rssi);
+		}
+		serial_send_bytes(PORT_VCOM, (uint8_t *)s, strlen(s), 1);
 	}
 }
 

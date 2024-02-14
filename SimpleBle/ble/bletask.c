@@ -13,6 +13,10 @@
 #include "bletask.h"
 #include "../itm_debug.h"
 #include "../serial/serial.h"
+#include "../resmsg.h"
+
+extern osMessageQId resQueueHandle;
+
 
 #if TEST_AT_ON_VCOM
 #undef PORT_BLE
@@ -65,9 +69,22 @@ extern osThreadId bleTaskHandle;
 
 void StartBleTask(void const * argument)
 {
+	uint32_t t0 = HAL_GetTick();
+
 	if ((0)) {
 		for (;;) {
 			osDelay(1000);
+		}
+	}
+	if ((1)) {
+		for (int i=0; ;i++) {
+			osDelay(1000);
+			resmsg_t m;
+			m.ts = HAL_GetTick() - t0;
+			m.type = 1;
+			m.devnum = 0;
+			m.rssi = i; // for instance
+			xQueueSend(resQueueHandle, &m, 10);
 		}
 	}
 	itm_debug1(DBG_BLE, "STRTb", 0);

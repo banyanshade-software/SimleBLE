@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "../../SimpleBle/resmsg.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,6 +52,9 @@ osStaticThreadDef_t comTaskControlBlock;
 osThreadId bleTaskHandle;
 uint32_t myBleTaskBuffer[ 256 ];
 osStaticThreadDef_t myBleTaskControlBlock;
+osMessageQId resQueueHandle;
+uint8_t resQueueBuffer[ 8 * sizeof( resmsg_t ) ];
+osStaticMessageQDef_t resQueueControlBlock;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -120,6 +123,11 @@ int main(void)
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
+
+  /* Create the queue(s) */
+  /* definition and creation of resQueue */
+  osMessageQStaticDef(resQueue, 8, resmsg_t, resQueueBuffer, &resQueueControlBlock);
+  resQueueHandle = osMessageCreate(osMessageQ(resQueue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
