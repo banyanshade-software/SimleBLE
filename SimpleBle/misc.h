@@ -13,6 +13,7 @@
 
 void flash_led(void);
 
+#define _UNUSED_ __attribute__((unused))
 
 
 
