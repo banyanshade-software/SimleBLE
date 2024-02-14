@@ -28,14 +28,18 @@ void StartComTask(void const * argument)
 	serial_t *ser = &serials[PORT_VCOM];
 	ser->taskHandle = comTaskHandle;
 	ser->linecallback = gotline;
-	serial_start_rx(PORT_VCOM);
+	// serial port is used only for logging
+	if ((0)) serial_start_rx(PORT_VCOM);
 	//serial_setup(PORT_VCOM, comTaskHandle);
 
-	const char *s = "coucou\r\n";
-	const int l = strlen(s);
-	for (;;) {
+	const char *s1 = "coucou\r\n";
+	const char *s2 = "hello\r\n";
+	for (int i=0;;i++) {
 		osDelay(500);
 		flash_led();
+		char *s = (i%3) ? s1 : s2;
+		int l = strlen(s);
+		itm_debug1(DBG_COM, "c-send", l);
 		serial_send_bytes(PORT_VCOM, (uint8_t *)s, l, 0);
 	}
 }

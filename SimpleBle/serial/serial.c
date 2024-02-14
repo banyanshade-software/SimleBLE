@@ -108,6 +108,10 @@ void HAL_UART_TxCpltCallback(_UNUSED_ UART_HandleTypeDef *huart)
 	s->txonprogress = 0;
 
 	BaseType_t higher=0;
+	if (!s->taskHandle) {
+		itm_debug1(DBG_ERR, "notask", port);
+		return;
+	}
 	xTaskNotifyFromISR(s->taskHandle, NOTIF_UART_TX, eSetBits, &higher);
 	portYIELD_FROM_ISR(higher);
 }
@@ -116,6 +120,8 @@ void HAL_UART_TxCpltCallback(_UNUSED_ UART_HandleTypeDef *huart)
 static void bh(void)
 {
 }
+
+
 void HAL_UARTEx_RxFifoFullCallback(_UNUSED_  UART_HandleTypeDef *huart)
 {
 	itm_debug1(DBG_SERIAL, "RxFifoFull", 0);
@@ -144,6 +150,7 @@ void HAL_UART_RxCpltCallback(_UNUSED_ UART_HandleTypeDef *huart)
 	char c = s->rxbuf[s->rxidx];
 	if (c == s->eolcar) {
 		s->linecallback(s, 1);
+		s->rxidx = 0;
 		serial_start_rx(port);
 		return;
 	}

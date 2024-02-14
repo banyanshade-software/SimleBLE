@@ -65,6 +65,11 @@ extern osThreadId bleTaskHandle;
 
 void StartBleTask(void const * argument)
 {
+	if ((0)) {
+		for (;;) {
+			osDelay(1000);
+		}
+	}
 	itm_debug1(DBG_BLE, "STRTb", 0);
 	serial_t *ser = &serials[PORT_VCOM];
 	ser->taskHandle = bleTaskHandle;
