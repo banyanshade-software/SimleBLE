@@ -5,10 +5,10 @@
  *      Author: danielbraun
  */
 
-#ifndef COM_SERIALCOM_H_
-#define COM_SERIALCOM_H_
+#ifndef COMPORT_SERIALCOM_H_
+#define COMPORT_SERIALCOM_H_
 
 void StartComTask(void const * argument);
 
 
-#endif /* COM_SERIALCOM_H_ */
+#endif /* COMPORT_SERIALCOM_H_ */
