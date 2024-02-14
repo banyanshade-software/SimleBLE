@@ -12,6 +12,10 @@
 #include "bletask.h"
 #include "../itm_debug.h"
 
+
+// HM-10 ressources
+// https://people.ece.cornell.edu/land/courses/ece4760/PIC32/uart/HM10/DSD%20TECH%20HM-10%20datasheet.pdf
+
 void StartBleTask(void const * argument)
 {
 	itm_debug1(DBG_BLE, "STRTb", 0);
