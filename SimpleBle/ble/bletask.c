@@ -16,6 +16,7 @@ void StartBleTask(void const * argument)
 {
 	itm_debug1(DBG_BLE, "STRTb", 0);
 	for (;;) {
+		itm_debug1(DBG_BLE, "hop", 0);
 		osDelay(1000);
 	}
 }
