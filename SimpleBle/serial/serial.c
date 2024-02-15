@@ -148,6 +148,7 @@ void HAL_UART_RxCpltCallback(_UNUSED_ UART_HandleTypeDef *huart)
 
 	serial_t *s = &serials[port];
 	char c = s->rxbuf[s->rxidx];
+	itm_debug2(DBG_SERIAL, "RX char", port, c);
 	if (c == s->eolcar) {
 		s->linecallback(s, 1);
 		s->rxidx = 0;

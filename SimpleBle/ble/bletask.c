@@ -50,6 +50,7 @@ at_cmd_t atcommand[NUM_CMD] = {
 		//{ .cmd="Longtemps je me suis couche de bonne heure. Parfois a peine ma bougie eteinte, mes yeux se fermaient si vite que je n'avais pas le temps de me dire ''je m'endors.'' Et, une demi-heure apres, la pensee qu'il etait temps de chercher le sommeil m'eveillait...\n" },
 		// base AT command
 		{ .cmd="AT\r\n"  },
+		{ .cmd="AT+RESET\r\n"  },
 		// several queries, not usefull
 		{ .cmd="AT+PIO10\r\n" },
 		{ .cmd="AT+ADDR?\r\n" }, // Query module address
