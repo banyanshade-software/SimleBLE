@@ -61,11 +61,18 @@ void StartComTask(void const * argument)
 		}
 		char s[64];
 		// TODO replace snprintf by custom func, since snprintf stack usage is huge
-		if (0 == m.type) {
+		if (type_info == m.type) {
 			// info
 			snprintf(s, sizeof(s),  "%10lu INFO %d %d\r\n", m.ts, m.devnum, m.infocode);
-		} else {
+		} else if (type_rssi == m.type) {
 			snprintf(s, sizeof(s),  "%10lu %d %d\r\n", m.ts, m.devnum, m.rssi);
+#if TEST_BLE_ECHO_VCOM
+		} else if ((type_tracetx == m.type) || (type_tracerx == m.type)) {
+			const char *strx = (type_tracetx == m.type) ? "TX: " : "RX: ";
+			serial_send_bytes(PORT_VCOM, (uint8_t *)strx, strlen(strx), 1);
+			serial_send_bytes(PORT_VCOM, (uint8_t *) m.line, strlen(m.line), 1);
+			continue;
+#endif
 		}
 		serial_send_bytes(PORT_VCOM, (uint8_t *)s, strlen(s), 1);
 	}

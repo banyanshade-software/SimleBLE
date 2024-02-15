@@ -50,7 +50,7 @@ at_cmd_t atcommand[NUM_CMD] = {
 		//{ .cmd="Longtemps je me suis couche de bonne heure. Parfois a peine ma bougie eteinte, mes yeux se fermaient si vite que je n'avais pas le temps de me dire ''je m'endors.'' Et, une demi-heure apres, la pensee qu'il etait temps de chercher le sommeil m'eveillait...\n" },
 		// base AT command
 		{ .cmd="AT\r\n"  },
-		{ .cmd="AT+RESET\r\n"  },
+		//{ .cmd="AT+RESET\r\n"  },
 		// several queries, not usefull
 		{ .cmd="AT+PIO10\r\n" },
 		{ .cmd="AT+ADDR?\r\n" }, // Query module address
@@ -92,6 +92,7 @@ void StartBleTask(void const * argument)
 	serial_t *ser = &serials[PORT_BLE];
 	ser->taskHandle = bleTaskHandle;
 	ser->linecallback = gotline;
+	ser->igncar = '\n';
 	serial_start_rx(PORT_BLE);
 
 	at_state_t state = state_wstart;
@@ -111,9 +112,20 @@ void StartBleTask(void const * argument)
 			}
 			itm_debug1(DBG_BLE, "sendcmd", cmdnum);
 			const char *cmd = atcommand[cmdnum].cmd;
-			serial_send_bytes(PORT_BLE, (const uint8_t *)cmd, strlen(cmd), 0);
+			int cmdlen = strlen(cmd);
+			serial_send_bytes(PORT_BLE, (const uint8_t *)cmd, cmdlen, 0);
 			cmdtick = HAL_GetTick();
 			state = state_wok;
+#if TEST_BLE_ECHO_VCOM
+			static resmsg_t m; // as static to avoid stack usage
+			int l = MAX(cmdlen, TRACE_LEN-1);
+			m.type = type_tracetx;
+			m.ts = cmdtick;
+			memcpy(m.line, cmd, l);
+			m.line[l] = '\0';
+			BaseType_t higher2=0;
+			xQueueSendFromISR(resQueueHandle,&m, &higher2);
+#endif
 			break;
 		case state_wok:
 			for (;;) {
@@ -168,6 +180,17 @@ static void gotline(serial_t *s, int ok)
 		s->rxidx = 0;
 		return;
 	}
+#if TEST_BLE_ECHO_VCOM
+	static resmsg_t m; // as static to avoid stack usage
+	int _l = MAX(s->rxidx, TRACE_LEN-1);
+	m.type = type_tracerx;
+	m.ts = HAL_GetTick();
+	memcpy(m.line, s->rxbuf, _l);
+	m.line[_l] = '\0';
+	BaseType_t higher2=0;
+	xQueueSendFromISR(resQueueHandle,&m, &higher2);
+#endif
+
 	if (s->rxidx<2) { // probably \r  (empty line)
 		s->rxidx = 0;
 		return;
@@ -181,6 +204,9 @@ static void gotline(serial_t *s, int ok)
 	memcpy(storebuf, s->rxbuf, l);
 	BaseType_t higher=0;
 	xTaskNotifyFromISR(s->taskHandle, okr ? NOTIF_AT_RESP_OK : NOTIF_AT_RESP_OTHER, eSetBits, &higher);
+#if TEST_BLE_ECHO_VCOM
+	higher |= higher2;
+#endif
 	portYIELD_FROM_ISR(higher);
 }
 

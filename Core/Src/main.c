@@ -47,7 +47,7 @@ DMA_HandleTypeDef hdma_lpuart1_tx;
 DMA_HandleTypeDef hdma_uart4_tx;
 
 osThreadId comTaskHandle;
-uint32_t comTaskBuffer[ 256 ];
+uint32_t comTaskBuffer[ 512 ];
 osStaticThreadDef_t comTaskControlBlock;
 osThreadId bleTaskHandle;
 uint32_t myBleTaskBuffer[ 256 ];
@@ -135,7 +135,7 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of comTask */
-  osThreadStaticDef(comTask, StartComTask, osPriorityNormal, 0, 256, comTaskBuffer, &comTaskControlBlock);
+  osThreadStaticDef(comTask, StartComTask, osPriorityNormal, 0, 512, comTaskBuffer, &comTaskControlBlock);
   comTaskHandle = osThreadCreate(osThread(comTask), NULL);
 
   /* definition and creation of bleTask */

@@ -39,6 +39,7 @@ typedef struct serial {
 	volatile uint16_t   rxidx;
 	volatile uint8_t    txonprogress;
 	uint8_t 		    eolcar;
+	uint8_t             igncar;
 } serial_t;
 
 #define NUM_SERIALS 2

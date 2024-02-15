@@ -25,7 +25,7 @@
 
 
 /* debug flags */
-uint32_t debug_flags = DBG_ERR|  DBG_COM | DBG_BLE ;
+uint32_t debug_flags = DBG_ERR|  DBG_COM | DBG_BLE | DBG_SERIAL ;
 
 
 #define DBG_

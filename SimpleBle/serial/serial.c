@@ -28,7 +28,7 @@ extern osThreadId bleTaskHandle;
 static uint8_t rxbuf0[256];
 static uint8_t rxbuf1[256];
 
-#define COMMON_INIT .eolcar='\r', .taskHandle=NULL, .rxidx=0, .txonprogress=0, .linecallback=NULL
+#define COMMON_INIT .igncar=0xFF, .eolcar='\r', .taskHandle=NULL, .rxidx=0, .txonprogress=0, .linecallback=NULL
 
 
 serial_t serials[NUM_SERIALS] = {
@@ -149,6 +149,10 @@ void HAL_UART_RxCpltCallback(_UNUSED_ UART_HandleTypeDef *huart)
 	serial_t *s = &serials[port];
 	char c = s->rxbuf[s->rxidx];
 	itm_debug2(DBG_SERIAL, "RX char", port, c);
+	if ((s->igncar != 0xFF) && (c == s->igncar)) {
+		serial_start_rx(port);
+		return;
+	}
 	if (c == s->eolcar) {
 		s->linecallback(s, 1);
 		s->rxidx = 0;
@@ -160,7 +164,6 @@ void HAL_UART_RxCpltCallback(_UNUSED_ UART_HandleTypeDef *huart)
 		s->linecallback(s, 0);
 		s->rxidx = 0;
 	}
-
 	serial_start_rx(port);
 
 }

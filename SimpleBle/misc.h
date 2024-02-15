@@ -14,7 +14,8 @@
 void flash_led(void);
 
 
-#define TEST_AT_ON_VCOM 0
+#define TEST_AT_ON_VCOM 	0
+#define TEST_BLE_ECHO_VCOM  1
 
 #define _UNUSED_ __attribute__((unused))
 
