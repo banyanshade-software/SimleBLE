@@ -44,12 +44,12 @@ static void gotline(serial_t *s, int ok);
 
 #define AT_DELAY 10000
 
-#define NUM_CMD 11
+#define NUM_CMD 10
 at_cmd_t atcommand[NUM_CMD] = {
 		// long command to exit sleep if any (>80)
-		{ .cmd="Longtemps je me suis couche de bonne heure. Parfois a peine ma bougie eteinte, mes yeux se fermaient si vite que je n'avais pas le temps de me dire ''je m'endors.'' Et, une demi-heure apres, la pensee qu'il etait temps de chercher le sommeil m'eveillait...\n" },
+		//{ .cmd="Longtemps je me suis couche de bonne heure. Parfois a peine ma bougie eteinte, mes yeux se fermaient si vite que je n'avais pas le temps de me dire ''je m'endors.'' Et, une demi-heure apres, la pensee qu'il etait temps de chercher le sommeil m'eveillait...\n" },
 		// base AT command
-		{ .cmd="AT\n"  },
+		{ .cmd="AT\r\n"  },
 		// several queries, not usefull
 		{ .cmd="AT+PIO10\r\n" },
 		{ .cmd="AT+ADDR?\r\n" }, // Query module address
@@ -76,7 +76,7 @@ void StartBleTask(void const * argument)
 			osDelay(1000);
 		}
 	}
-	if ((1)) {
+	if ((0)) {
 		for (int i=0; ;i++) {
 			osDelay(1000);
 			resmsg_t m;
@@ -88,10 +88,10 @@ void StartBleTask(void const * argument)
 		}
 	}
 	itm_debug1(DBG_BLE, "STRTb", 0);
-	serial_t *ser = &serials[PORT_VCOM];
+	serial_t *ser = &serials[PORT_BLE];
 	ser->taskHandle = bleTaskHandle;
 	ser->linecallback = gotline;
-	serial_start_rx(PORT_VCOM);
+	serial_start_rx(PORT_BLE);
 
 	at_state_t state = state_wstart;
 	int cmdnum = 0;
@@ -135,7 +135,9 @@ void StartBleTask(void const * argument)
 				} else  {
 					itm_debug1(DBG_BLE|DBG_ERR, "timeout", cmdnum);
 					osDelay(5000);
-					state = state_wstart;
+					if ((0)) {
+						state = state_wstart;
+					}
 					break;
 				}
 			}
