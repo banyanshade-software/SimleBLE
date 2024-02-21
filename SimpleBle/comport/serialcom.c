@@ -73,7 +73,7 @@ void StartComTask(void const * argument)
 #if TEST_BLE_ECHO_VCOM
 		} else if ((type_tracetx == m.type) || (type_tracerx == m.type)) {
 			itm_debug2(DBG_COM, "trace", m.type, strlen(m.line));
-			const char *strx = (type_tracetx == m.type) ? "TX: " : "RX:\r\n";
+			const char *strx = (type_tracetx == m.type) ? "TX:" : "RX:";
 			serial_send_bytes(PORT_VCOM, (uint8_t *) strx, strlen(strx), 0);
 			serial_send_bytes(PORT_VCOM, (uint8_t *) m.line, strlen(m.line), 1);
 			if (type_tracerx==m.type) serial_send_bytes(PORT_VCOM, (uint8_t *) "\n", 1, 0);

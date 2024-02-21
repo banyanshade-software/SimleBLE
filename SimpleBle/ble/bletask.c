@@ -26,6 +26,11 @@ extern osMessageQId resQueueHandle;
 // HM-10 ressources
 // https://people.ece.cornell.edu/land/courses/ece4760/PIC32/uart/HM10/DSD%20TECH%20HM-10%20datasheet.pdf
 
+// AT-09 BLE Module
+// https://www.studiopieters.nl/arduino-at-09-ble-module/
+// http://denethor.wlu.ca/arduino/MLT-BT05-AT-commands-TRANSLATED.pdf
+// https://github.com/MikeBland/mbtx/blob/67b420da816811c60e76f29b2caf57f69fa63083/radio/ersky9x/src/X12D/e.cpp#L2329
+
 
 typedef enum {
 	state_wstart,
@@ -45,14 +50,14 @@ static void gotline(serial_t *s, int ok);
 
 #define AT_DELAY 10000
 
-#define NUM_CMD 14
+#define NUM_CMD 12
 
 at_cmd_t atcommand[NUM_CMD] = {
 		// long command to exit sleep if any (>80)
 		//{ .cmd="Longtemps je me suis couche de bonne heure. Parfois a peine ma bougie eteinte, mes yeux se fermaient si vite que je n'avais pas le temps de me dire ''je m'endors.'' Et, une demi-heure apres, la pensee qu'il etait temps de chercher le sommeil m'eveillait...\n" },
 		// base AT command
 /*0*/	{ .cmd="AT\r\n"  },
-		{ .cmd="AT+VERSION?\r\n" },
+		//{ .cmd="AT+VERSION?\r\n" },
 		//{ .cmd="AT+HELP\r\n" },
 		//{ .waitbefore=6000, .cmd="AT\r\n"  },
 
@@ -72,20 +77,30 @@ at_cmd_t atcommand[NUM_CMD] = {
 		// doc say : Please set AT+ROLE1 and AT+IMME1 first.
 		{ .cmd="AT+NAMEbletest\r\n" },
 /*1*/	{ .cmd="AT+ROLE1\r\n" }, // 1=central, 0=periph
-/*2*/   { .cmd="AT+IMME1\r\n" }, // role 0=start immed, 1=wait for AT conn
+/*2*/   //{ .cmd="AT+IMME1\r\n" }, // role 0=start immed, 1=wait for AT conn
 		//{ .cmd="AT+DISC?\r\n" },
 		// ibeacon discovery
         // { .cmd="AT+SHOW\r\n" },
 /*3*/	//{ .cmd="AT+DISI?\r\n" },
 		//{ .cmd="AT\r\n" },$
-//{ .cmd="AT+CMODE?\r\n" },
-{ .cmd="AT+INQ\r\n" },
+		//{ .cmd="AT+CMODE?\r\n" },
+		// { .cmd="AT+ADVI3\r\n" },
+		// { .cmd="AT+POWE0\r\n" },
+		// { .cmd="AT+RMAAD\r\n" },
+//{ .cmd="AT+CMODE0"},
+{ .cmd="AT+TYPE?\n\r" },
+
+{ .cmd="AT+INQM?\r\n" },
+{ .cmd="AT+INQM=1,9,20\r\n" },
+		{ .cmd="AT+INQ\r\n" }, // INQ1 start scanning, INQ0 stopscan
+		{ .cmd="\r\n" },
+		{ .cmd="AT+INQ\r\n" }, // INQ1 start scanning, INQ0 stopscan
+		{ .cmd="\r\n" },
 		{ .cmd="AT+SHOW\r\n" },
-		{ .cmd="AT+DISC\r\n" },
+
 		{ .cmd="AT+SHOW\r\n" },
-		{ .cmd="AT+DISI\r\n" },
 		{ .cmd="AT+SHOW\r\n" },
-		{ .cmd="AT+DISA\r\n" },
+		//{ .cmd="AT+INQ0\r\n" }, // INQ1 start scanning, INQ0 stopscan
 		{ .cmd="AT+SHOW\r\n" },
 		{ .cmd="AT+SHOW\r\n" },
 
