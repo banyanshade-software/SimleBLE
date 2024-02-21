@@ -39,6 +39,10 @@ void StartComTask(void const * argument)
 	// serial port is used only for logging
 	if ((0)) serial_start_rx(PORT_VCOM);
 
+	if ((1)) {
+		const char *s = "hello ----------------------------------------------------- \r\n";
+		serial_send_bytes(PORT_VCOM, (uint8_t *)s, strlen(s), 0);
+	}
 
 	if ((0)) {
 		const char *s1 = "coucou\r\n";
@@ -68,9 +72,11 @@ void StartComTask(void const * argument)
 			snprintf(s, sizeof(s),  "%10lu %d %d\r\n", m.ts, m.devnum, m.rssi);
 #if TEST_BLE_ECHO_VCOM
 		} else if ((type_tracetx == m.type) || (type_tracerx == m.type)) {
-			const char *strx = (type_tracetx == m.type) ? "TX: " : "RX: ";
-			serial_send_bytes(PORT_VCOM, (uint8_t *)strx, strlen(strx), 1);
+			itm_debug2(DBG_COM, "trace", m.type, strlen(m.line));
+			const char *strx = (type_tracetx == m.type) ? "TX: " : "RX:\r\n";
+			serial_send_bytes(PORT_VCOM, (uint8_t *) strx, strlen(strx), 0);
 			serial_send_bytes(PORT_VCOM, (uint8_t *) m.line, strlen(m.line), 1);
+			if (type_tracerx==m.type) serial_send_bytes(PORT_VCOM, (uint8_t *) "\n", 1, 0);
 			continue;
 #endif
 		}
@@ -80,7 +86,7 @@ void StartComTask(void const * argument)
 
 static void gotline(serial_t *s, int ok)
 {
-	itm_debug1(DBG_COM, "line", s->rxidx);
+	itm_debug1(DBG_COM, "cline", s->rxidx);
 	s->rxidx = 0;
 }
 

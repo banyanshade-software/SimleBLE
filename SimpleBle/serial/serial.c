@@ -62,6 +62,10 @@ int serial_start_rx(int port)
 
  int serial_send_bytes(int port, const uint8_t *b, int len, int needcopy)
 {
+	 if (!len) {
+		 itm_debug1(DBG_SERIAL, "tx 0", port);
+		 return 0;
+	 }
 	serial_t *s = &serials[port];
 
 	while (s->txonprogress) {
